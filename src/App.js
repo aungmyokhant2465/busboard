@@ -3,8 +3,8 @@ import { gql, useQuery, useLazyQuery } from '@apollo/client'
 import Clock from 'react-live-clock';
 
 const TRIPS = gql`
-query MyQuery ($id: Int!) {
-  ptp_trips(where: {depart_time: {_gt: "2021-01-02T03:07:45.96386+00:00"}, ptp_route: {fk_start_terminal: {_eq: $id}}}) {
+query MyQuery ($id: Int!, $nowDate: timestamptz) {
+  ptp_trips(where: {depart_time: {_gt: $nowDate}, ptp_route: {fk_start_terminal: {_eq: $id}}}, limit: 7) {
     depart_time
     vehicle_account {
       vehicle_plate_number
@@ -39,12 +39,6 @@ const App = () => {
   const [ terminal, setTerminal ] = useState({})
 
   useEffect(() => {
-    if(terminal.transport_terminal_id) {
-      loadTrips({ variables: { id: terminal.transport_terminal_id }})
-    }
-  }, [loadTrips, terminal])
-
-  useEffect(() => {
     if(resultTrips.data) {
       setTrips(resultTrips.data.ptp_trips)
     }
@@ -56,8 +50,11 @@ const App = () => {
 
   const handleChange = (e) => {
     let id = e.target.value
-    let ter = result.data.transport_terminal_information.find(t => t.transport_terminal_id == id)
+    let ter = result.data.transport_terminal_information.find(t => t.transport_terminal_id === Number(id))
     setTerminal(ter)
+    if(ter.transport_terminal_id) {
+      loadTrips({ variables: { id: ter.transport_terminal_id, nowDate: new Date() }})
+    }
   }
 
   const handleBack = () => {
@@ -69,7 +66,7 @@ const App = () => {
       <main>
           <header>
               <h2>Bus Line Board</h2>
-              <h3 tabIndex='1' onClick={handleBack} >{terminal.transport_terminal_name}</h3>
+              <h3 tabIndex='1' onClick={handleBack} > {'<<'} Back</h3>
           </header>
           <article>
             {
@@ -115,9 +112,9 @@ const App = () => {
                         trips.map((t, index) => (
                           <tr key={index} >
                             <td>{t.depart_time}</td>
-                            <td>{t.ptp_route.start_terminal.transport_terminal_name}</td>
-                            <td>{t.ptp_route.end_terminal.transport_terminal_name}</td>
-                            <td>{t.vehicle_account.vehicle_plate_number}</td>
+                            <td>{t.ptp_route.start_terminal?.transport_terminal_name}</td>
+                            <td>{t.ptp_route.end_terminal?.transport_terminal_name}</td>
+                            <td>{t.vehicle_account?.vehicle_plate_number}</td>
                           </tr>
                         ))
                       }
