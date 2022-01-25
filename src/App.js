@@ -37,12 +37,27 @@ const App = () => {
 
   const [ trips, setTrips ] = useState(null)
   const [ terminal, setTerminal ] = useState({})
+  const [ inter, setInter ] = useState(null)
 
   useEffect(() => {
     if(resultTrips.data) {
       setTrips(resultTrips.data.ptp_trips)
     }
   }, [resultTrips.data])
+
+  // let inter
+  useEffect(() => {
+    if(trips && trips.length > 0) {
+      const inte = setInterval(() => {
+        loadTrips({ variables: { id: terminal.transport_terminal_id, nowDate: new Date() }})
+      }, (1000 * 60 * 5));
+      setInter(inte)
+    } else {
+      clearInterval(inter)
+    }
+    console.log(inter)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [trips])
 
   if(result.loading || resultTrips.loading) {
     return <div>Loading...</div>
