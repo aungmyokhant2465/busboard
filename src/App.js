@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import { gql, useQuery, useLazyQuery } from '@apollo/client'
 import Clock from 'react-live-clock';
+import moment from 'moment';
+import GIF from './images/GIF.gif';
+import Slider from './Slider';
+import Announce from './Announce';
 
 const TRIPS = gql`
 query MyQuery ($id: Int!, $nowDate: timestamptz) {
-  ptp_trips(where: {depart_time: {_gt: $nowDate}, ptp_route: {fk_start_terminal: {_eq: $id}}}, limit: 7) {
+  ptp_trips(where: {depart_time: {_gt: $nowDate}, ptp_route: {fk_start_terminal: {_eq: $id}}}, limit: 10) {
     depart_time
     vehicle_account {
       vehicle_plate_number
@@ -55,7 +59,6 @@ const App = () => {
     } else {
       clearInterval(inter)
     }
-    console.log(inter)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [trips])
 
@@ -77,76 +80,88 @@ const App = () => {
   }
 
   return (
-    <>
-      <main>
-          <header>
-              <h2>Bus Line Board</h2>
-              <h3 tabIndex='1' onClick={handleBack} > {'<<'} Back</h3>
-          </header>
-          <article>
-            {
-              (!trips) && (
-                <div>
-                  <div className='form-group' >
-                    <label htmlFor='terminal' >Select Start Terminal</label>
-                    <select id='terminal' name='terminal' onChange={handleChange}>
-                      <option></option>
-                      {
-                        result.data.transport_terminal_information.map((t, index) => 
-                          <option value={t.transport_terminal_id} key={index}>{t.transport_terminal_name}</option>
-                        )
-                      }
-                    </select>
-                  </div>
-                </div>
-              )
-            }
-            {
-              (trips && trips.length === 0) && (
-                <div className='info' >
-                  <p>There is no trips with {terminal.transport_terminal_name}</p>
-                  <h3 tabIndex='1' onClick={handleBack} >Reselect terminal</h3>
-                </div>
-              )
-            }
-            {
-              ( trips && trips.length > 0) && (
-                <>
-                  <table>
-                    <caption>Showing bus depart time</caption>
-                    <thead>
+    <div className='container'>
+      {
+        (!trips) && (
+          <div className='form-group' >
+            <label htmlFor='terminal' >Select Start Terminal</label>
+            <select id='terminal' name='terminal' onChange={handleChange}>
+              <option></option>
+              {
+                result.data.transport_terminal_information.map((t, index) => 
+                  <option value={t.transport_terminal_id} key={index}>{t.transport_terminal_name}</option>
+                )
+              }
+            </select>
+          </div>
+        )
+      }
+      {
+        (trips && trips.length === 0) && (
+          <div className='info' >
+            <p>There is no trips with {terminal.transport_terminal_name}</p>
+            <div tabIndex='1' onClick={handleBack} >Reselect terminal</div>
+          </div>
+        )
+      }
+      {
+        ( trips && trips.length > 0) && 
+        <>
+          <main>
+            <table id="conta">
+              <thead>
+                <tr>
+                  <th id="imgContainer" rowSpan='2' ><img src={GIF} id="logoGIF" alt='oro logo'/></th>
+                  <th colSpan='2'>STA. ROSA INTEGRATED TERMINAL</th>
+                  <th rowSpan='2' id='clock-container'><Clock format={'HH:mm:ss'} ticking={true} /></th>
+                </tr>
+                <tr>
+                  <th colSpan='2'>SRIT BUS SCHEDULES</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td colSpan='3'>
+                    <table id='inner'>
+                      <thead>
                         <tr>
-                            <th>Depart Time</th>
-                            <th>Start Terminal Name</th>
-                            <th>End Terminal Name</th>
-                            <th>Plate Number</th>
+                          <th>DESTINATION</th>
+                          <th>DEPARTURE</th>
+                          <th>BAY</th>
+                          <th>PLATE NUMBER</th>
                         </tr>
-                    </thead>
-                    <tbody>
-                      {
-                        trips.map((t, index) => (
-                          <tr key={index} >
-                            <td>{t.depart_time}</td>
-                            <td>{t.ptp_route.start_terminal?.transport_terminal_name}</td>
-                            <td>{t.ptp_route.end_terminal?.transport_terminal_name}</td>
-                            <td>{t.vehicle_account?.vehicle_plate_number}</td>
-                          </tr>
-                        ))
-                      }
-                    </tbody>
-                  </table>
-                  <section className='time-container'>
-                    <span>Current Time - </span>
-                    <Clock format={'HH:mm:ss'} ticking={true} />
-                  </section>
-                </>
-              )
-            }
-          </article>
-      </main>
-      <footer>
-      </footer>
-    </>
+                      </thead>
+                      <tbody>
+                        {
+                          trips.map((t, index) => (
+                            <tr key={index} >
+                              <td>{t.ptp_route.end_terminal?.transport_terminal_name}</td>
+                              <td>{moment(t.depart_time).format('LT')}</td>
+                              <td></td>
+                              <td>{t.vehicle_account?.vehicle_plate_number}</td>
+                            </tr>
+                          ))
+                        }
+                      </tbody>
+                    </table>
+                  </td>
+                  <td>
+                    <Slider />
+                  </td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colSpan='4'>
+                    <Announce />
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </main>
+        </>
+      }
+    </div>
   )
 }
 

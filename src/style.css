@@ -1,0 +1,166 @@
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+        sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    /* box-sizing: border-box; */
+}
+
+body {
+    background-color: blue;
+}
+
+main {
+    width: 100%;
+    height: 100%;
+}
+
+/* article {
+    width: 20%;
+    height: 90%;
+    border: 3px solid rgb(26, 25, 27);
+    float: left;
+}
+
+footer {
+    width: 100%;
+    height: 10%;
+    background-color: rgb(129, 122, 122);
+    clear: both;
+} */
+
+table#conta {
+    margin: 0;
+    padding: 0;
+    table-layout: fixed;
+    width: 100%;
+    /* height: 88%; */
+    text-align: center;
+    color: #fff;
+    border-collapse: collapse;
+    /* border: 3px solid rgb(26, 25, 27); */
+}
+
+table#inner {
+    margin: 0;
+    padding: 0;
+    table-layout: fixed;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    color: #fff;
+    border-collapse: collapse;
+}
+
+#inner thead th {
+    width: 30%;
+}
+
+#inner thead th:nth-child(3) {
+    width: 10%;
+}
+
+table#innner td {
+    text-align: left;
+}
+
+tbody td, thead th {
+    border: 3px solid black;
+    height: 60px;
+}
+
+/* #conta th, #conta td {
+    height: 65px;
+} */
+
+/* th, td {
+    line-height: 2;
+} */
+
+#inner th {
+    line-height: 3;
+}
+
+tfoot td {
+    line-height: 2;
+}
+
+th#imgContainer {
+    height: initial;
+}
+
+
+#logoGIF {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.container {
+    width: 100%;
+    height: 100vh;
+}
+
+div.form-group {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 40%;
+    left: 35%;
+}
+
+label {
+    font-size: 1.5rem;
+    color: whitesmoke;
+}
+
+select {
+    width: 30vw;
+    padding : .5em 2.5em .5em .5em;
+    font-size: 1.5rem;
+    border: 3px solid #5c36e3;
+    border-radius: 5px;
+    box-shadow: 0 .1em .2em rgba(0,0,0,.45);
+    margin-top: 3px;
+    background : linear-gradient(0deg, #E3E3E3, #fcfcfc 50%, #f0f0f0);
+}
+
+#clock-container > * {
+    font-size: 2rem;
+    letter-spacing: 10px;
+}
+
+div.info {
+    width: 100vw;
+    height: 100vh;
+    color: snow;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.info > div {
+    font-size: 1.5rem;
+    text-decoration: underline;
+    cursor: pointer;
+}
+  
+.info > div:hover {
+    color: #1c0081;
+  }
+  
+.info > div:focus {
+    color: #24155a;
+  }
+  
+.info > div:active {
+    color: #534c6b;
+}
