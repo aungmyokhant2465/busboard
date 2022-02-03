@@ -3,7 +3,7 @@ import { gql, useQuery, useLazyQuery } from '@apollo/client'
 import Clock from 'react-live-clock';
 import moment from 'moment';
 import GIF from './images/GIF.gif';
-import Slider from './Slider';
+import Slider2 from './Slider2';
 import Announce from './Announce';
 
 const TRIPS = gql`
@@ -146,7 +146,8 @@ const App = () => {
                     </table>
                   </td>
                   <td>
-                    <Slider />
+                    {/* <Slider /> */}
+                    <Slider2 />
                   </td>
                 </tr>
               </tbody>
