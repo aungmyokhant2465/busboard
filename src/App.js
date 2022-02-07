@@ -5,10 +5,9 @@ import moment from 'moment';
 import GIF from './images/GIF.gif';
 import Slider2 from './Slider2';
 import Announce from './Announce';
-import Image1 from './images/image1.png';import {
-  CSSTransition,
-  TransitionGroup,
-} from 'react-transition-group';
+import Image1 from './images/image1.png';
+
+import { SwitchTransition, CSSTransition } from 'react-transition-group'
 
 const TRIPS = gql`
 query MyQuery ($id: Int!, $nowDate: timestamptz) {
@@ -45,43 +44,30 @@ const App = () => {
     notifyOnNetworkStatusChange: true,
     // pollInterval: 5000
   })
-  const [loadTripsAgain, resultTripsAgain] = useLazyQuery(TRIPS, {
-    fetchPolicy: 'network-only',
-    notifyOnNetworkStatusChange: true,
-    // pollInterval: 5000
-  })
   const result = useQuery(TRANSPORTTERMINALSNAME)
 
-  const [ trips, setTrips ] = useState(null)
+  const [ trips, setTrips ] = useState([])
   const [ terminal, setTerminal ] = useState(null)
-  const [ inter, setInter ] = useState(null)
   const [ selected, setSelected ] = useState(false)
 
   useEffect(() => {
     if(resultTrips.data) {
       setTrips(resultTrips.data.ptp_trips)
-      setSelected(true)
+      if(trips?.length > 0) {
+        setSelected(true)
+      }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resultTrips])
 
   useEffect(() => {
-    if(resultTripsAgain.data) {
-      console.log('hi')
-      setTrips(resultTripsAgain.data.ptp_trips)
-    }
-  }, [resultTripsAgain.data])
-
-  useEffect(() => {
     if(selected) {
-      console.log('start')
-      const inte = setInterval(() => {
+      setInterval(() => {
         let date = new Date()
         // loadTrips({ variables: { id: terminal.transport_terminal_id, nowDate: new Date('2022-02-19T03:24:00') }})
         // console.log(her)
         resultTrips.refetch({ id: terminal.transport_terminal_id, nowDate: date })
       }, (1000 * 5));
-      // setInter(inte)
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selected])
@@ -107,7 +93,7 @@ const App = () => {
   return (
     <div className='container'>
       {
-        (!trips && !terminal) && (
+        (!terminal) && (
           <div className='form-group' >
             <label htmlFor='terminal' >Select Start Terminal</label>
             <select id='terminal' name='terminal' onChange={handleChange}>
@@ -122,7 +108,7 @@ const App = () => {
         )
       }
       {
-        (trips && trips.length === 0) && (
+        (terminal && trips && trips.length === 0) && (
           <div className='info' >
             <p>There is no trips with {terminal.transport_terminal_name}</p>
             <div tabIndex='1' onClick={handleBack} >Reselect terminal</div>
@@ -130,7 +116,7 @@ const App = () => {
         )
       }
       {
-        (terminal) &&
+        (terminal && selected) &&
         <>
           <main>
             <table id="conta">
@@ -159,37 +145,55 @@ const App = () => {
                           <th>PLATE NUMBER</th>
                         </tr>
                       </thead>
-                      {
-                      ( trips && trips.length > 0) && (
-                      // <tbody>
-                      <TransitionGroup component="tbody" className="todo-list">
-                        {
-                          trips.map((t, index) => (
-                            <CSSTransition
-                              // in={!!trips.length}
-                              key={index}
-                              timeout={2000}
-                              classNames="item"
-                            >
-                              <tr>
-                                <td>{t.ptp_route.end_terminal?.transport_terminal_name}</td>
-                                <td>{moment(t.depart_time).format('LT')}</td>
-                                <td></td>
-                                <td>{t.vehicle_account?.vehicle_plate_number}</td>
-                              </tr>
-                            </CSSTransition>
-                          ))
-                        }
-                      </TransitionGroup>
-                      // </tbody>
+                      {/* {
+                      ( trips && trips.length > 0) ? (
+                          <tbody>
+                            {
+                              trips.map((t, index) => (
+                                  <tr
+                                  key={index}
+                                  >
+                                    <td>{t.ptp_route.end_terminal?.transport_terminal_name}</td>
+                                    <td>{moment(t.depart_time).format('LT')}</td>
+                                    <td></td>
+                                    <td>{t.vehicle_account?.vehicle_plate_number}</td>
+                                  </tr>
+                              ))
+                            }
+                          </tbody>
+                      ) : (
+                        <tbody id='demo'>
+                        </tbody>
                       )
-                      }
-                      
+                      } */}
+                      <SwitchTransition mode={'out-in'}>
+                        <CSSTransition
+                          key={trips && trips.length > 0}
+                          addEndListener={(node, done) => {
+                            node.addEventListener("transitionend", done, false);
+                          }}
+                          classNames="fade"
+                        >
+                          <tbody>
+                            {
+                              trips && trips.map((t, index) => (
+                                  <tr
+                                  key={index}
+                                  >
+                                    <td>{t.ptp_route.end_terminal?.transport_terminal_name}</td>
+                                    <td>{moment(t.depart_time).format('LT')}</td>
+                                    <td></td>
+                                    <td>{t.vehicle_account?.vehicle_plate_number}</td>
+                                  </tr>
+                              ))
+                            }
+                          </tbody>
+                        </CSSTransition>
+                      </SwitchTransition>
                     </table>
                   </td>
                   <td>
-                    {/* <Slider /> */}
-                    <img src={Image1} style={{width:'100%'}} alt="" />
+                    <img src={Image1} style={{width:'80%'}} alt="" />
                   </td>
                 </tr>
                 <tr>

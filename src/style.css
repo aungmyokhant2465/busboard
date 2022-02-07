@@ -75,7 +75,11 @@ table#innner td {
 
 tbody td, thead th {
     border: 3px solid black;
-    height: 5%;
+    height: 50px;
+}
+
+tbody#demo {
+    height: 500px;
 }
 
 .header {
@@ -173,18 +177,21 @@ div.info {
     color: #534c6b;
 }
 
-.item-enter {
+.fade-enter{
     opacity: 0;
-}
-.item-enter-active {
+ }
+ .fade-exit{
     opacity: 1;
-    transition: opacity 2000ms ease-in;
-}
-.item-exit {
+ }
+ .fade-enter-active{
     opacity: 1;
-}
-.item-exit-active {
+    /* transform: translateY(-200px); */
+ }
+ .fade-exit-active{
     opacity: 0;
-    transition: opacity 2000ms ease-in;
-}
-  
+    transform: translateY(100px);
+ }
+ .fade-enter-active,
+ .fade-exit-active{
+    transition: all 2000ms;
+ }
