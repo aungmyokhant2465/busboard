@@ -10,6 +10,7 @@ body {
 * {
     margin: 0;
     padding: 0;
+    text-transform: uppercase;
     /* box-sizing: border-box; */
 }
 
@@ -42,7 +43,7 @@ table#conta {
     padding: 0;
     table-layout: fixed;
     width: 100%;
-    /* height: 88%; */
+    /* height: 80%; */
     text-align: center;
     color: #fff;
     border-collapse: collapse;
@@ -74,7 +75,13 @@ table#innner td {
 
 tbody td, thead th {
     border: 3px solid black;
-    height: 60px;
+    height: 5%;
+}
+
+.header {
+    /* padding: 1rem; */
+    font-size: 2.8rem;
+    /* line-height: 1.5; */
 }
 
 /* #conta th, #conta td {
@@ -165,3 +172,19 @@ div.info {
 .info > div:active {
     color: #534c6b;
 }
+
+.item-enter {
+    opacity: 0;
+}
+.item-enter-active {
+    opacity: 1;
+    transition: opacity 2000ms ease-in;
+}
+.item-exit {
+    opacity: 1;
+}
+.item-exit-active {
+    opacity: 0;
+    transition: opacity 2000ms ease-in;
+}
+  
