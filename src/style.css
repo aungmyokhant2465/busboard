@@ -63,6 +63,7 @@ table#inner {
 
 #inner thead th {
   width: 30%;
+  height: 8%;
 }
 
 #inner thead th:nth-child(3) {
@@ -71,6 +72,10 @@ table#inner {
 
 table#innner td {
   text-align: left;
+}
+
+table#inner tbody {
+  height: 83.5%;
 }
 
 tbody td,

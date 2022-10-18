@@ -1,7 +1,7 @@
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -60,14 +60,17 @@ table {
 }
 
 thead th:nth-child(1) {
-  width: 25%
-}
-
-thead th:nth-child(2), thead th:nth-child(3), thead th:nth-child(4) {
   width: 25%;
 }
 
-th, td {
+thead th:nth-child(2),
+thead th:nth-child(3),
+thead th:nth-child(4) {
+  width: 25%;
+}
+
+th,
+td {
   padding: 20px;
 }
 
@@ -145,13 +148,13 @@ label {
 
 select {
   width: 30vw;
-  padding : .5em 2.5em .5em .5em;
+  padding: 0.5em 2.5em 0.5em 0.5em;
   font-size: 1.5rem;
   border: 3px solid #5c36e3;
   border-radius: 5px;
-  box-shadow: 0 .1em .2em rgba(0,0,0,.45);
+  box-shadow: 0 0.1em 0.2em rgba(0, 0, 0, 0.45);
   margin-top: 3px;
-  background : linear-gradient(0deg, #E3E3E3, #fcfcfc 50%, #f0f0f0);
+  background: linear-gradient(0deg, #e3e3e3, #fcfcfc 50%, #f0f0f0);
 }
 
 div.info {
@@ -162,5 +165,5 @@ div.info {
   margin: 1rem;
   font-size: 1.8rem;
   color: #fff;
-  text-shadow: 1px 1px 2px rgba(0,0,0,.6);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
 }

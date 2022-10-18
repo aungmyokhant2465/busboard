@@ -5,22 +5,30 @@ import moment from "moment";
 import GIF from "./images/GIF.gif";
 import Slider2 from "./Slider2";
 import Announce from "./Announce";
-import Image1 from "./images/image1.png";
+// import Image1 from "./images/image1.png";
 
 import { SwitchTransition, CSSTransition } from "react-transition-group";
 
 const TRIPS = gql`
-  query MyQuery($id: Int!, $nowDate: timestamptz) {
+  query MyQuery($id: Int!, $nowDate: timestamptz, $vehicle: String!) {
     ptp_trips(
       where: {
-        depart_time: { _gt: $nowDate }
-        ptp_route: { fk_start_terminal: { _eq: $id } }
+        _and: {
+          depart_time: { _gt: $nowDate }
+          ptp_route: { fk_start_terminal: { _eq: $id } }
+          vehicle_account: {
+            vehicle_type_and_information: { vehicle_type: { _ilike: $vehicle } }
+          }
+        }
       }
       limit: 10
     ) {
       depart_time
       vehicle_account {
         vehicle_plate_number
+        vehicle_type_and_information {
+          vehicle_type
+        }
       }
       ptp_route {
         end_terminal {
@@ -70,28 +78,65 @@ const App = () => {
   const [trips, setTrips] = useState([]);
   const [terminal, setTerminal] = useState(null);
   const [selected, setSelected] = useState(false);
+  const [vehicle, setVehicle] = useState("BUS");
 
   useEffect(() => {
     if (resultTrips.data) {
       setTrips(resultTrips.data.ptp_trips);
-      if (trips?.length > 0) {
-        setSelected(true);
-      }
+      setSelected(true);
+      // if (trips?.length > 0) {
+      //   setSelected(true);
+      // }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resultTrips]);
 
   useEffect(() => {
     if (selected) {
+      let counter = 1;
       setInterval(() => {
-        let date = new Date();
-        // loadTrips({ variables: { id: terminal.transport_terminal_id, nowDate: new Date('2022-02-19T03:24:00') }})
-        // console.log(her)
-        resultTrips.refetch({
-          id: terminal.transport_terminal_id,
-          nowDate: date,
-        });
-      }, 1000 * 10);
+        if (counter === 1) {
+          let date = new Date();
+          // loadTrips({ variables: { id: terminal.transport_terminal_id, nowDate: new Date('2022-02-19T03:24:00') }})
+          resultTrips
+            .refetch({
+              id: terminal.transport_terminal_id,
+              nowDate: date,
+              vehicle: "UV",
+            })
+            .then((res) => {
+              console.log(res);
+              setVehicle("UV");
+            });
+          counter = 2;
+        } else if (counter === 2) {
+          let date = new Date();
+          resultTrips
+            .refetch({
+              id: terminal.transport_terminal_id,
+              nowDate: date,
+              vehicle: "JITNEY",
+            })
+            .then((res) => {
+              console.log(res);
+              setVehicle("JEEPNEY");
+            });
+          counter = 3;
+        } else if (counter === 3) {
+          let date = new Date();
+          resultTrips
+            .refetch({
+              id: terminal.transport_terminal_id,
+              nowDate: date,
+              vehicle: "BUS",
+            })
+            .then((res) => {
+              console.log(res);
+              setVehicle("BUS");
+            });
+          counter = 1;
+        }
+      }, 1000 * 5);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selected]);
@@ -108,7 +153,11 @@ const App = () => {
     setTerminal(ter);
     if (ter.transport_terminal_id) {
       loadTrips({
-        variables: { id: ter.transport_terminal_id, nowDate: new Date() },
+        variables: {
+          id: ter.transport_terminal_id,
+          nowDate: new Date(),
+          vehicle: "BUS",
+        },
       });
     }
   };
@@ -133,14 +182,7 @@ const App = () => {
           </select>
         </div>
       )}
-      {terminal && trips && trips.length === 0 && (
-        <div className="info">
-          <p>There is no trips with {terminal.transport_terminal_name}</p>
-          <div tabIndex="1" onClick={handleBack}>
-            Reselect terminal
-          </div>
-        </div>
-      )}
+
       {terminal && selected && (
         <>
           <main>
@@ -159,8 +201,12 @@ const App = () => {
                   </th>
                 </tr>
                 <tr>
-                  <th colSpan="2" className="header">
-                    SRIT BUS SCHEDULES
+                  <th
+                    colSpan="2"
+                    className="header"
+                    style={{ color: "#FFD700" }}
+                  >
+                    SRIT {vehicle} SCHEDULES
                   </th>
                 </tr>
               </thead>
@@ -197,38 +243,85 @@ const App = () => {
                         </tbody>
                       )
                       } */}
+                      {/* <div className="info">
+                          <p>
+                            There is no trips with{" "}
+                            {terminal.transport_terminal_name}
+                          </p>
+                          <div tabIndex="1" onClick={handleBack}>
+                            Reselect terminal
+                          </div>
+                        </div> */}
+
                       <SwitchTransition mode={"out-in"}>
                         <CSSTransition
                           key={trips && trips.length > 0}
                           addEndListener={(node, done) => {
-                            node.addEventListener("transitionend", done, false);
+                            node.addEventListener(
+                              "transitionend",
+                              () => {
+                                resultTrips.loading && done();
+                              },
+                              false
+                            );
                           }}
                           classNames="fade"
                         >
-                          <tbody>
-                            {trips &&
-                              trips.map((t, index) => (
-                                <tr key={index}>
-                                  <td>
-                                    {
-                                      t.ptp_route.end_terminal
-                                        ?.transport_terminal_name
-                                    }
-                                  </td>
-                                  <td>{moment(t.depart_time).format("LT")}</td>
-                                  <td></td>
-                                  <td>
-                                    {t.vehicle_account?.vehicle_plate_number}
-                                  </td>
-                                </tr>
-                              ))}
-                          </tbody>
+                          {resultTrips.loading ? (
+                            <tbody>
+                              <tr>
+                                <td colSpan="4" className="info">
+                                  Loading...
+                                </td>
+                              </tr>
+                            </tbody>
+                          ) : terminal && trips && trips.length === 0 ? (
+                            <tbody>
+                              <tr>
+                                <td colSpan="4" className="info">
+                                  <p>
+                                    There is no trips with{" "}
+                                    {terminal.transport_terminal_name}
+                                  </p>
+                                  <div tabIndex="1" onClick={handleBack}>
+                                    Reselect terminal
+                                  </div>
+                                </td>
+                              </tr>
+                            </tbody>
+                          ) : (
+                            <tbody>
+                              {trips &&
+                                trips.map((t, index) => (
+                                  <tr key={index}>
+                                    <td>
+                                      {
+                                        t.ptp_route.end_terminal
+                                          ?.transport_terminal_name
+                                      }
+                                    </td>
+                                    <td>
+                                      {moment(t.depart_time).format("LT")}
+                                    </td>
+                                    <td></td>
+                                    <td>
+                                      {t.vehicle_account?.vehicle_plate_number}
+                                    </td>
+                                  </tr>
+                                ))}
+                            </tbody>
+                          )}
                         </CSSTransition>
                       </SwitchTransition>
                     </table>
                   </td>
                   <td>
                     {/* <img src={Image1} style={{ width: "80%" }} alt="" /> */}
+                    <Slider2 />
+                  </td>
+                </tr>
+                <tr>
+                  <td>
                     <div style={style1}>
                       <iframe
                         style={style2}
@@ -241,11 +334,6 @@ const App = () => {
                         title="livestream"
                       ></iframe>
                     </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <Slider2 />
                   </td>
                 </tr>
               </tbody>
