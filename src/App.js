@@ -16,9 +16,7 @@ const TRIPS = gql`
         _and: {
           depart_time: { _gt: $nowDate }
           ptp_route: { fk_start_terminal: { _eq: $id } }
-          vehicle_account: {
-            vehicle_type_and_information: { vehicle_type: { _ilike: $vehicle } }
-          }
+          vehicle_account: { fk_vehicle_type: { _ilike: $vehicle } }
         }
       }
       limit: 10
@@ -26,9 +24,7 @@ const TRIPS = gql`
       depart_time
       vehicle_account {
         vehicle_plate_number
-        vehicle_type_and_information {
-          vehicle_type
-        }
+        fk_vehicle_type
       }
       ptp_route {
         end_terminal {
