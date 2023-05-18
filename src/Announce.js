@@ -1,11 +1,16 @@
 /* eslint-disable jsx-a11y/no-distracting-elements */
 import React from "react";
-import './announce.css'
+import "./announce.css";
 
 const Announce = () => {
-    return (
-        <marquee>Google LLC is an American multinational technology company that specializes in Internet-related services and products, which include online advertising technologies, a search engine, cloud computing, software, and hardware. Google, American search engine company, founded in 1998 by Sergey Brin and Larry Page, that is a subsidiary of the holding company Alphabet Inc. More than ...</marquee>
-    )
-}
+  return (
+    <marquee>
+      - Skip the queue. Download ORO Wallet Mobile App to purchase your travel
+      tickets at your own convenience. - Proceed to one of our counters to
+      purchase your ORO Card today. - Need to top-up your ORO Card or Mobile
+      Wallet? Please proceed to one of our counters.
+    </marquee>
+  );
+};
 
-export default Announce
+export default Announce;

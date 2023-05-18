@@ -8,6 +8,13 @@ import "swiper/css/effect-cube";
 import "swiper/css/autoplay";
 
 import "./slider2.css";
+import Image1 from "./images/image1.jpg";
+import Image2 from "./images/image2.jpg";
+import Image3 from "./images/image3.jpg";
+import Image4 from "./images/image4.jpg";
+import Image5 from "./images/image5.jpg";
+import Image6 from "./images/image6.jpg";
+import Image7 from "./images/image7.jpg";
 
 // import required modules
 import { EffectCube, Autoplay } from "swiper";
@@ -30,16 +37,25 @@ export default function App() {
         className="mySwiper"
       >
         <SwiperSlide>
-          <img src="https://swiperjs.com/demos/images/nature-1.jpg" />
+          <img src={Image1} />
         </SwiperSlide>
         <SwiperSlide>
-          <img src="https://swiperjs.com/demos/images/nature-2.jpg" />
+          <img src={Image2} />
         </SwiperSlide>
         <SwiperSlide>
-          <img src="https://swiperjs.com/demos/images/nature-3.jpg" />
+          <img src={Image3} />
         </SwiperSlide>
         <SwiperSlide>
-          <img src="https://swiperjs.com/demos/images/nature-4.jpg" />
+          <img src={Image4} />
+        </SwiperSlide>
+        <SwiperSlide>
+          <img src={Image5} />
+        </SwiperSlide>
+        <SwiperSlide>
+          <img src={Image7} />
+        </SwiperSlide>
+        <SwiperSlide>
+          <img src={Image6} />
         </SwiperSlide>
       </Swiper>
     </>

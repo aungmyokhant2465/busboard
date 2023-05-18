@@ -10,13 +10,12 @@ import Announce from "./Announce";
 import { SwitchTransition, CSSTransition } from "react-transition-group";
 
 const TRIPS = gql`
-  query MyQuery($id: Int!, $nowDate: timestamptz, $vehicle: String!) {
+  query MyQuery($id: Int!, $nowDate: timestamptz) {
     ptp_trips(
       where: {
         _and: {
           depart_time: { _gt: $nowDate }
           ptp_route: { fk_start_terminal: { _eq: $id } }
-          vehicle_account: { fk_vehicle_type: { _ilike: $vehicle } }
         }
       }
       limit: 10
@@ -74,7 +73,7 @@ const App = () => {
   const [trips, setTrips] = useState([]);
   const [terminal, setTerminal] = useState(null);
   const [selected, setSelected] = useState(false);
-  const [vehicle, setVehicle] = useState("BUS");
+  // const [vehicle, setVehicle] = useState("BUS");
 
   useEffect(() => {
     if (resultTrips.data) {
@@ -87,52 +86,70 @@ const App = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resultTrips]);
 
+  // useEffect(() => {
+  //   if (selected) {
+  //     let counter = 1;
+  //     setInterval(() => {
+  //       if (counter === 1) {
+  //         let date = new Date();
+  //         // loadTrips({ variables: { id: terminal.transport_terminal_id, nowDate: new Date('2022-02-19T03:24:00') }})
+  //         resultTrips
+  //           .refetch({
+  //             id: terminal.transport_terminal_id,
+  //             nowDate: date,
+  //             vehicle: "UV",
+  //           })
+  //           .then((res) => {
+  //             console.log(res);
+  //             setVehicle("UV");
+  //           });
+  //         counter = 2;
+  //       } else if (counter === 2) {
+  //         let date = new Date();
+  //         resultTrips
+  //           .refetch({
+  //             id: terminal.transport_terminal_id,
+  //             nowDate: date,
+  //             vehicle: "JITNEY",
+  //           })
+  //           .then((res) => {
+  //             console.log(res);
+  //             setVehicle("JEEPNEY");
+  //           });
+  //         counter = 3;
+  //       } else if (counter === 3) {
+  //         let date = new Date();
+  //         resultTrips
+  //           .refetch({
+  //             id: terminal.transport_terminal_id,
+  //             nowDate: date,
+  //             vehicle: "BUS",
+  //           })
+  //           .then((res) => {
+  //             console.log(res);
+  //             setVehicle("BUS");
+  //           });
+  //         counter = 1;
+  //       }
+  //     }, 1000 * 5 * 60);
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [selected]);
+
   useEffect(() => {
     if (selected) {
-      let counter = 1;
       setInterval(() => {
-        if (counter === 1) {
-          let date = new Date();
-          // loadTrips({ variables: { id: terminal.transport_terminal_id, nowDate: new Date('2022-02-19T03:24:00') }})
-          resultTrips
-            .refetch({
-              id: terminal.transport_terminal_id,
-              nowDate: date,
-              vehicle: "UV",
-            })
-            .then((res) => {
-              console.log(res);
-              setVehicle("UV");
-            });
-          counter = 2;
-        } else if (counter === 2) {
-          let date = new Date();
-          resultTrips
-            .refetch({
-              id: terminal.transport_terminal_id,
-              nowDate: date,
-              vehicle: "JITNEY",
-            })
-            .then((res) => {
-              console.log(res);
-              setVehicle("JEEPNEY");
-            });
-          counter = 3;
-        } else if (counter === 3) {
-          let date = new Date();
-          resultTrips
-            .refetch({
-              id: terminal.transport_terminal_id,
-              nowDate: date,
-              vehicle: "BUS",
-            })
-            .then((res) => {
-              console.log(res);
-              setVehicle("BUS");
-            });
-          counter = 1;
-        }
-      }, 1000 * 5);
+        let date = new Date();
+        // loadTrips({ variables: { id: terminal.transport_terminal_id, nowDate: new Date('2022-02-19T03:24:00') }})
+        resultTrips
+          .refetch({
+            id: terminal.transport_terminal_id,
+            nowDate: date,
+          })
+          .then((res) => {
+            console.log(res);
+          });
+      }, 1000 * 5 * 60);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selected]);
@@ -152,7 +169,6 @@ const App = () => {
         variables: {
           id: ter.transport_terminal_id,
           nowDate: new Date(),
-          vehicle: "BUS",
         },
       });
     }
@@ -189,7 +205,7 @@ const App = () => {
                     <img src={GIF} id="logoGIF" alt="oro logo" />
                   </th>
                   <th colSpan="2" className="header">
-                    STA. ROSA INTEGRATED TERMINALs
+                    BATAAN TERMINAL COMPLEX
                   </th>
                   <th rowSpan="2" id="clock-container">
                     {moment().format("LL")} <br />
@@ -202,7 +218,7 @@ const App = () => {
                     className="header"
                     style={{ color: "#FFD700" }}
                   >
-                    SRIT {vehicle} SCHEDULES
+                    BTC Vehicle Schedules
                   </th>
                 </tr>
               </thead>
