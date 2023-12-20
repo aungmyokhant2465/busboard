@@ -66,8 +66,8 @@ table#inner {
   height: 8%;
 }
 
-#inner thead th:nth-child(3) {
-  width: 10%;
+#inner thead th:nth-child(1) {
+  width: 40%;
 }
 
 table#innner td {

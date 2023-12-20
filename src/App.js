@@ -1,50 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { gql, useQuery, useLazyQuery } from "@apollo/client";
 import Clock from "react-live-clock";
 import moment from "moment";
 import GIF from "./images/GIF.gif";
 import Slider2 from "./Slider2";
 import Announce from "./Announce";
-// import Image1 from "./images/image1.png";
 
 import { SwitchTransition, CSSTransition } from "react-transition-group";
-
-const TRIPS = gql`
-  query MyQuery($id: Int!, $nowDate: timestamptz) {
-    ptp_trips(
-      where: {
-        _and: {
-          depart_time: { _gt: $nowDate }
-          ptp_route: { fk_start_terminal: { _eq: $id } }
-        }
-      }
-      limit: 10
-    ) {
-      depart_time
-      vehicle_account {
-        vehicle_plate_number
-        fk_vehicle_type
-      }
-      ptp_route {
-        end_terminal {
-          transport_terminal_name
-        }
-        start_terminal {
-          transport_terminal_name
-        }
-      }
-    }
-  }
-`;
-
-const TRANSPORTTERMINALSNAME = gql`
-  query MyQuery {
-    transport_terminal_information {
-      transport_terminal_id
-      transport_terminal_name
-    }
-  }
-`;
 
 const style1 = {
   position: "relative",
@@ -62,304 +23,145 @@ const style2 = {
   overflow: "hidden",
 };
 
+const busAndUV = [
+  { name: "BNHS (Arellano)", gate: 1, bay: "1 - 2" },
+  { name: "Olongapo (Hi-way)", gate: 2, bay: "3" },
+  { name: "Olongapo (Loob)", gate: 2, bay: "4" },
+  { name: "Bagac", gate: 3, bay: "5" },
+  { name: "San Fernando", gate: 4, bay: "6" },
+  { name: "Mariveles", gate: 4, bay: "7 - 8" },
+  { name: "Orani (Modernized)", gate: 5, bay: "9" },
+  { name: "Morong", gate: 6, bay: "10" },
+  { name: "Dau", gate: 7, bay: "12 - 13" },
+];
+
+const puj = [
+  { name: "Bagac", gate: 7, bay: "14" },
+  { name: "BNAS", gate: 7, bay: "15" },
+  { name: "Parang", gate: 8, bay: "16" },
+  { name: "Cabog-Cabog", gate: 8, bay: "17" },
+  { name: "Lamao", gate: 9, bay: "18 - 19" },
+  { name: "Dinalupihan", gate: 9, bay: "20" },
+  { name: "Orani", gate: 10, bay: "21 - 23" },
+  { name: "Abucay", gate: 11, bay: "24" },
+];
+
+let l = 8;
+
 const App = () => {
-  const [loadTrips, resultTrips] = useLazyQuery(TRIPS, {
-    fetchPolicy: "network-only",
-    notifyOnNetworkStatusChange: true,
-    // pollInterval: 5000
-  });
-  const result = useQuery(TRANSPORTTERMINALSNAME);
-
-  const [trips, setTrips] = useState([]);
-  const [terminal, setTerminal] = useState(null);
-  const [selected, setSelected] = useState(false);
-  // const [vehicle, setVehicle] = useState("BUS");
+  const [trips, setTrips] = useState(busAndUV);
+  const [loading, setLoading] = useState(false);
+  const [type, setType] = useState("BUS & UV EXPRESS");
 
   useEffect(() => {
-    if (resultTrips.data) {
-      setTrips(resultTrips.data.ptp_trips);
-      setSelected(true);
-      // if (trips?.length > 0) {
-      //   setSelected(true);
-      // }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resultTrips]);
-
-  // useEffect(() => {
-  //   if (selected) {
-  //     let counter = 1;
-  //     setInterval(() => {
-  //       if (counter === 1) {
-  //         let date = new Date();
-  //         // loadTrips({ variables: { id: terminal.transport_terminal_id, nowDate: new Date('2022-02-19T03:24:00') }})
-  //         resultTrips
-  //           .refetch({
-  //             id: terminal.transport_terminal_id,
-  //             nowDate: date,
-  //             vehicle: "UV",
-  //           })
-  //           .then((res) => {
-  //             console.log(res);
-  //             setVehicle("UV");
-  //           });
-  //         counter = 2;
-  //       } else if (counter === 2) {
-  //         let date = new Date();
-  //         resultTrips
-  //           .refetch({
-  //             id: terminal.transport_terminal_id,
-  //             nowDate: date,
-  //             vehicle: "JITNEY",
-  //           })
-  //           .then((res) => {
-  //             console.log(res);
-  //             setVehicle("JEEPNEY");
-  //           });
-  //         counter = 3;
-  //       } else if (counter === 3) {
-  //         let date = new Date();
-  //         resultTrips
-  //           .refetch({
-  //             id: terminal.transport_terminal_id,
-  //             nowDate: date,
-  //             vehicle: "BUS",
-  //           })
-  //           .then((res) => {
-  //             console.log(res);
-  //             setVehicle("BUS");
-  //           });
-  //         counter = 1;
-  //       }
-  //     }, 1000 * 5 * 60);
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [selected]);
-
-  useEffect(() => {
-    if (selected) {
-      setInterval(() => {
-        let date = new Date();
-        // loadTrips({ variables: { id: terminal.transport_terminal_id, nowDate: new Date('2022-02-19T03:24:00') }})
-        resultTrips
-          .refetch({
-            id: terminal.transport_terminal_id,
-            nowDate: date,
-          })
-          .then((res) => {
-            console.log(res);
-          });
-      }, 1000 * 5 * 60);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selected]);
-
-  if (result.loading) {
-    return <div>Loading...</div>;
-  }
-
-  const handleChange = (e) => {
-    let id = e.target.value;
-    let ter = result.data.transport_terminal_information.find(
-      (t) => t.transport_terminal_id === Number(id)
-    );
-    setTerminal(ter);
-    if (ter.transport_terminal_id) {
-      loadTrips({
-        variables: {
-          id: ter.transport_terminal_id,
-          nowDate: new Date(),
-        },
-      });
-    }
-  };
-
-  const handleBack = () => {
-    setTrips(null);
-    setTerminal(null);
-  };
+    setInterval(() => {
+      setLoading(true);
+      if (l === 9) {
+        l = 8;
+        setTrips(puj);
+        setType("PUJ");
+      } else if (l === 8) {
+        setTrips(busAndUV);
+        setType("BUS & UV EXPRESS");
+        l = 9;
+      }
+      setLoading(false);
+    }, 1000 * 10);
+  }, []);
 
   return (
     <div className="container">
-      {!terminal && (
-        <div className="form-group">
-          <label htmlFor="terminal">Select Start Terminal</label>
-          <select id="terminal" name="terminal" onChange={handleChange}>
-            <option></option>
-            {result.data.transport_terminal_information.map((t, index) => (
-              <option value={t.transport_terminal_id} key={index}>
-                {t.transport_terminal_name}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
-
-      {terminal && selected && (
-        <>
-          <main>
-            <table id="conta">
-              <thead>
-                <tr>
-                  <th id="imgContainer" rowSpan="2">
-                    <img src={GIF} id="logoGIF" alt="oro logo" />
-                  </th>
-                  <th colSpan="2" className="header">
-                    BATAAN TERMINAL COMPLEX
-                  </th>
-                  <th rowSpan="2" id="clock-container">
-                    {moment().format("LL")} <br />
-                    <Clock format={"HH:mm:ss"} ticking={true} />
-                  </th>
-                </tr>
-                <tr>
-                  <th
-                    colSpan="2"
-                    className="header"
-                    style={{ color: "#FFD700" }}
-                  >
-                    BTC Vehicle Schedules
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td colSpan="3" rowSpan="2">
-                    <table id="inner">
-                      <thead>
-                        <tr>
-                          <th>DESTINATION</th>
-                          <th>DEPARTURE</th>
-                          <th>BAY</th>
-                          <th>PLATE NUMBER</th>
-                        </tr>
-                      </thead>
-                      {/* {
-                      ( trips && trips.length > 0) ? (
-                          <tbody>
-                            {
-                              trips.map((t, index) => (
-                                  <tr
-                                  key={index}
-                                  >
-                                    <td>{t.ptp_route.end_terminal?.transport_terminal_name}</td>
-                                    <td>{moment(t.depart_time).format('LT')}</td>
-                                    <td></td>
-                                    <td>{t.vehicle_account?.vehicle_plate_number}</td>
-                                  </tr>
-                              ))
-                            }
-                          </tbody>
-                      ) : (
-                        <tbody id='demo'>
-                        </tbody>
-                      )
-                      } */}
-                      {/* <div className="info">
-                          <p>
-                            There is no trips with{" "}
-                            {terminal.transport_terminal_name}
-                          </p>
-                          <div tabIndex="1" onClick={handleBack}>
-                            Reselect terminal
-                          </div>
-                        </div> */}
-
-                      <SwitchTransition mode={"out-in"}>
-                        <CSSTransition
-                          key={trips && trips.length > 0}
-                          addEndListener={(node, done) => {
-                            node.addEventListener(
-                              "transitionend",
-                              () => {
-                                resultTrips.loading && done();
-                              },
-                              false
-                            );
-                          }}
-                          classNames="fade"
-                        >
-                          {resultTrips.loading ? (
-                            <tbody>
-                              <tr>
-                                <td colSpan="4" className="info">
-                                  Loading...
-                                </td>
-                              </tr>
-                            </tbody>
-                          ) : terminal && trips && trips.length === 0 ? (
-                            <tbody>
-                              <tr>
-                                <td colSpan="4" className="info">
-                                  <p>
-                                    There is no trips with{" "}
-                                    {terminal.transport_terminal_name}
-                                  </p>
-                                  <div tabIndex="1" onClick={handleBack}>
-                                    Reselect terminal
-                                  </div>
-                                </td>
-                              </tr>
-                            </tbody>
-                          ) : (
-                            <tbody>
-                              {trips &&
-                                trips.map((t, index) => (
-                                  <tr key={index}>
-                                    <td>
-                                      {
-                                        t.ptp_route.end_terminal
-                                          ?.transport_terminal_name
-                                      }
-                                    </td>
-                                    <td>
-                                      {moment(t.depart_time).format("LT")}
-                                    </td>
-                                    <td></td>
-                                    <td>
-                                      {t.vehicle_account?.vehicle_plate_number}
-                                    </td>
-                                  </tr>
-                                ))}
-                            </tbody>
-                          )}
-                        </CSSTransition>
-                      </SwitchTransition>
-                    </table>
-                  </td>
-                  <td>
-                    {/* <img src={Image1} style={{ width: "80%" }} alt="" /> */}
-                    <Slider2 />
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <div style={style1}>
-                      <iframe
-                        style={style2}
-                        frameBorder="0"
-                        type="text/html"
-                        src="https://geo.dailymotion.com/player/x5poh.html?video=x5cr6b9&mute=true"
-                        width="100%"
-                        height="100%"
-                        allow="autoplay"
-                        title="livestream"
-                      ></iframe>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-              <tfoot>
-                <tr>
-                  <td colSpan="4">
-                    <Announce />
-                  </td>
-                </tr>
-              </tfoot>
-            </table>
-          </main>
-        </>
-      )}
+      <main>
+        <table id="conta">
+          <thead>
+            <tr>
+              <th id="imgContainer" rowSpan="2">
+                <img src={GIF} id="logoGIF" alt="oro logo" />
+              </th>
+              <th colSpan="2" className="header">
+                BATAAN TERMINAL COMPLEX
+              </th>
+              <th rowSpan="2" id="clock-container">
+                {moment().format("LL")}
+                <br />
+                <Clock format={"HH:mm:ss"} ticking={true} />
+              </th>
+            </tr>
+            <tr>
+              <th colSpan="2" className="header" style={{ color: "#FFD700" }}>
+                BTC Vehicle Schedules
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td colSpan="3" rowSpan="2">
+                <table id="inner">
+                  <thead>
+                    <tr>
+                      <th>{type}</th>
+                      <th>GATE</th>
+                      <th>BAY</th>
+                    </tr>
+                  </thead>
+                  <SwitchTransition mode={"out-in"}>
+                    <CSSTransition
+                      key={trips}
+                      addEndListener={(node, done) => {
+                        node.addEventListener(
+                          "transitionend",
+                          () => {
+                            loading && done();
+                          },
+                          false
+                        );
+                      }}
+                      classNames="fade"
+                    >
+                      <tbody>
+                        {trips &&
+                          trips.map((t, index) => (
+                            <tr key={index}>
+                              <td>{t.name}</td>
+                              <td>{t.gate}</td>
+                              <td>{t.bay}</td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </CSSTransition>
+                  </SwitchTransition>
+                </table>
+              </td>
+              <td>
+                <Slider2 />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div style={style1}>
+                  <iframe
+                    style={style2}
+                    frameBorder="0"
+                    type="text/html"
+                    src="https://geo.dailymotion.com/player/x5poh.html?video=x5cr6b9&mute=true"
+                    width="100%"
+                    height="100%"
+                    allow="autoplay"
+                    title="livestream"
+                  ></iframe>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colSpan="4">
+                <Announce />
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </main>
     </div>
   );
 };
